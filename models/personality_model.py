@@ -2,6 +2,7 @@ import json
 import os
 from typing import Dict, List, Any
 from utils.openai_helper import OpenAIHelper
+from utils.database_helper import db
 
 class PersonalityModel:
     """

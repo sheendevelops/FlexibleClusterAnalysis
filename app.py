@@ -19,17 +19,27 @@ if 'learning_mode' not in st.session_state:
     st.session_state.learning_mode = False
 
 def load_conversations():
-    """Load conversation history from file"""
+    """Load conversation history from database"""
     try:
-        with open('data/conversations.json', 'r') as f:
-            return json.load(f)
-    except FileNotFoundError:
+        from utils.database_helper import db
+        return db.get_recent_records('conversations', limit=100)
+    except Exception as e:
+        print(f"Error loading conversations: {e}")
         return []
 
-def save_conversations(conversations):
-    """Save conversation history to file"""
-    with open('data/conversations.json', 'w') as f:
-        json.dump(conversations, f, indent=2)
+def save_conversation(user_id, user_message, assistant_response, model_insights, emotion_detected):
+    """Save conversation to database"""
+    try:
+        from utils.database_helper import db
+        db.insert_one('conversations', {
+            'user_id': user_id,
+            'user_message': user_message,
+            'assistant_response': assistant_response,
+            'model_insights': model_insights,
+            'emotion_detected': emotion_detected
+        })
+    except Exception as e:
+        print(f"Error saving conversation: {e}")
 
 def main():
     st.set_page_config(
@@ -179,16 +189,14 @@ def main():
                 
                 st.session_state.chat_history.append(assistant_message)
                 
-                # Save conversation
-                conversations = load_conversations()
-                conversations.append({
-                    'user_id': st.session_state.user_id,
-                    'user_message': user_input,
-                    'assistant_response': response['message'],
-                    'timestamp': datetime.now().isoformat(),
-                    'model_insights': response.get('model_insights', {})
-                })
-                save_conversations(conversations)
+                # Save conversation to database
+                save_conversation(
+                    st.session_state.user_id,
+                    user_input,
+                    response['message'],
+                    response.get('model_insights', {}),
+                    response.get('detected_emotion', 'neutral')
+                )
                 
                 # Rerun to show new messages
                 st.rerun()

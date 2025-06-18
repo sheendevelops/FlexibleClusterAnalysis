@@ -159,14 +159,18 @@ class ConscienceModel:
             
             response = self.openai_helper.get_structured_response(prompt)
             
-            # Store assessment
-            self.knowledge["human_impact_assessments"].append({
-                "action": action,
-                "context": context,
-                "assessment": response,
-                "timestamp": self.openai_helper.get_current_timestamp()
-            })
-            self.save_knowledge()
+            # Store assessment in database
+            try:
+                db.insert_one('conscience_knowledge', {
+                    'scenario': f"Impact assessment: {action}",
+                    'context': context,
+                    'analysis': response,
+                    'ethical_score': response.get('impact_score', 0),
+                    'humanitarian_impact': response.get('short_term_effects', 'Unknown'),
+                    'source': 'impact_assessment'
+                })
+            except Exception as e:
+                print(f"Error storing impact assessment: {e}")
             
             return response
             
@@ -185,17 +189,29 @@ class ConscienceModel:
         """
         if new_principle not in self.ethical_principles:
             self.ethical_principles.append(new_principle)
-            self.knowledge["moral_principles"] = self.ethical_principles
-            self.save_knowledge()
+            try:
+                db.insert_one('ethical_principles', {
+                    'principle': new_principle,
+                    'category': 'user_added'
+                })
+            except Exception as e:
+                print(f"Error adding ethical principle: {e}")
     
     def get_conscience_summary(self) -> Dict[str, Any]:
         """
         Get a summary of the conscience model's knowledge and focus areas
         """
+        try:
+            cases_count = db.count_records('conscience_knowledge')
+            principles_count = db.count_records('ethical_principles')
+        except Exception:
+            cases_count = 0
+            principles_count = len(self.ethical_principles)
+        
         return {
-            "ethical_principles": len(self.ethical_principles),
-            "cases_analyzed": len(self.knowledge.get("ethical_cases", [])),
-            "impact_assessments": len(self.knowledge.get("human_impact_assessments", [])),
+            "ethical_principles": principles_count,
+            "cases_analyzed": cases_count,
+            "impact_assessments": cases_count,  # Combined for simplicity
             "focus_areas": [
                 "Human dignity and wellbeing",
                 "Ethical decision making",
