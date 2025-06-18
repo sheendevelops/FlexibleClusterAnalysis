@@ -1,0 +1,17 @@
+Please create a flexible unsupervised learning model preferable in python language, which should be able to accept data in the form of text and image and also flexible to accept live video and sounds. May be smell in future.  I want the model to learn from pdfs and online study articles and mostly interested in understanding different human emotions.
+
+Can you make the model architecture based on the below guidelines:
+Have the model analyze any given data using 2 knowledge models. The first model be a human conscience based model which should understand human ethics and give preference to humanity. The second model should be logic based model which should give preference to logical well being and profitability. 
+There should be third model which should remember people, their preference and neccisities and provide solutions and answers specific to the personality of the interacting person.
+There should be a forth master model called AISapien which should decide the output based on the analysis from these 3 models and give preference for betterment of humanity. The master model should be able to decide based on past outcomes and keep track of timelines and be in context.
+
+The master model should be able to interact in the form of chat with me when I am online and able to ask questions based on the knowledge it acquired and update the models it has. Also the master model should provide status on what skills it has acquired through the chat and avoid learning sinister topics from internet. whenever the model is unable to decide if the topic is sinister, ask me for confirmation before going through it.
+
+Let these knowledge models create many other sub models as it acquires knowledge and keep updating the models or split the existing models as needed. The ML pattern mechanism should allow the master model to be able to explore how the patterns from different sub models can be used for the betterment of its other models. 
+
+The master model should be governing what all knowledge models can learn and should be allocating the resources as needed. It should give resource preference to chat interactions than the knowledge models.
+
+The master model should understand day and night and how humans work and rest. Also it should understand what factors affect humans and provide chat suggestions to avoid them.
+
+The master model should be thinker and should think how using the knowledge acquired it could create something new and provide its ideas in the chat.
+
