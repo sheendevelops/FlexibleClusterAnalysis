@@ -2,6 +2,7 @@ import json
 import os
 from typing import Dict, List, Any
 from utils.openai_helper import OpenAIHelper
+from utils.database_helper import db
 
 class ConscienceModel:
     """
@@ -11,37 +12,25 @@ class ConscienceModel:
     
     def __init__(self):
         self.openai_helper = OpenAIHelper()
-        self.ethical_principles = [
-            "Human dignity and respect",
-            "Fairness and justice",
-            "Compassion and empathy",
-            "Non-maleficence (do no harm)",
-            "Autonomy and freedom",
-            "Truth and honesty",
-            "Protection of vulnerable populations",
-            "Environmental responsibility"
-        ]
-        self.knowledge_file = "data/conscience_knowledge.json"
-        self.load_knowledge()
+        self.load_ethical_principles()
     
-    def load_knowledge(self):
-        """Load ethical knowledge and case studies"""
+    def load_ethical_principles(self):
+        """Load ethical principles from database"""
         try:
-            with open(self.knowledge_file, 'r') as f:
-                self.knowledge = json.load(f)
-        except FileNotFoundError:
-            self.knowledge = {
-                "ethical_cases": [],
-                "moral_principles": self.ethical_principles,
-                "human_impact_assessments": []
-            }
-            self.save_knowledge()
-    
-    def save_knowledge(self):
-        """Save ethical knowledge to file"""
-        os.makedirs(os.path.dirname(self.knowledge_file), exist_ok=True)
-        with open(self.knowledge_file, 'w') as f:
-            json.dump(self.knowledge, f, indent=2)
+            principles = db.find_many('ethical_principles', order_by='id')
+            self.ethical_principles = [p['principle'] for p in principles]
+        except Exception as e:
+            # Fallback to default principles if database fails
+            self.ethical_principles = [
+                "Human dignity and respect",
+                "Fairness and justice",
+                "Compassion and empathy",
+                "Non-maleficence (do no harm)",
+                "Autonomy and freedom",
+                "Truth and honesty",
+                "Protection of vulnerable populations",
+                "Environmental responsibility"
+            ]
     
     def analyze_ethical_implications(self, scenario: str, context: str = "") -> Dict[str, Any]:
         """
@@ -68,14 +57,18 @@ class ConscienceModel:
             
             response = self.openai_helper.get_structured_response(prompt)
             
-            # Store this analysis for learning
-            self.knowledge["ethical_cases"].append({
-                "scenario": scenario,
-                "context": context,
-                "analysis": response,
-                "timestamp": self.openai_helper.get_current_timestamp()
-            })
-            self.save_knowledge()
+            # Store this analysis in database
+            try:
+                db.insert_one('conscience_knowledge', {
+                    'scenario': scenario,
+                    'context': context,
+                    'analysis': response,
+                    'ethical_score': response.get('ethical_score', 5),
+                    'humanitarian_impact': response.get('humanitarian_impact', 'Unknown'),
+                    'source': 'ethical_analysis'
+                })
+            except Exception as e:
+                print(f"Error storing ethical analysis: {e}")
             
             return response
             
@@ -132,16 +125,9 @@ class ConscienceModel:
         Find ethical cases relevant to the current query
         """
         try:
-            relevant_cases = []
-            query_lower = query.lower()
-            
-            for case in self.knowledge.get("ethical_cases", []):
-                scenario_text = case.get("scenario", "").lower()
-                if any(word in scenario_text for word in query_lower.split()):
-                    relevant_cases.append(case)
-            
-            return relevant_cases[-5:]  # Return last 5 relevant cases
-            
+            # Search for relevant cases in database
+            relevant_cases = db.search_text('conscience_knowledge', 'scenario', query, limit=5)
+            return relevant_cases
         except Exception:
             return []
     
