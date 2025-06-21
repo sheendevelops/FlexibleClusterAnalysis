@@ -1,1 +1,24 @@
-[]
+[
+  {
+    "timestamp": "2025-06-21T03:45:12.945392",
+    "user_id": "default_user",
+    "input_message": "hi",
+    "model_insights": {
+      "conscience": "Unable to get AI response: Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download",
+      "logic": "Unable to get AI response: Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download",
+      "personality": "Unable to get AI response: Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download"
+    },
+    "final_response": "Unable to get AI response: Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download",
+    "decision_factors": [
+      "Prioritize human wellbeing and dignity",
+      "Seek truth and accuracy",
+      "Promote fairness and justice",
+      "Consider long-term consequences",
+      "Respect individual autonomy",
+      "Foster human growth and learning",
+      "Protect vulnerable populations",
+      "Encourage ethical behavior"
+    ],
+    "time_of_day": "Night"
+  }
+]

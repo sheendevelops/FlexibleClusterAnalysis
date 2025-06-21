@@ -22,7 +22,9 @@ The application follows a modular architecture with clear separation of concerns
 ### Utilities
 - **Content Filter**: Identifies potentially harmful or inappropriate content
 - **Emotion Detector**: Analyzes emotional context in user messages
-- **OpenAI Helper**: Manages interactions with OpenAI's GPT-4o model
+- **ML Analytics**: Advanced machine learning features for pattern analysis
+- **ML Integration**: Integration layer for applying ML insights to improve AI decisions
+- **Ollama Helper**: Manages local LLM interactions for offline operation
 - **Web Scraper**: Extracts content from websites using Trafilatura
 
 ## Key Components
@@ -108,6 +110,7 @@ JSON-based knowledge storage for:
 - June 18, 2025: Initial setup with OpenAI integration
 - June 21, 2025: Added PostgreSQL database support 
 - June 21, 2025: Integrated Ollama for offline AI operation
+- June 21, 2025: Added advanced ML features: PCA, EDA, clustering, dimensionality reduction, grid search, elbow method, silhouette score, gap statistic
 
 ## User Preferences
 

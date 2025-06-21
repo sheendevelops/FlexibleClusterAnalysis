@@ -1,1 +1,11 @@
-{}
+{
+  "default_user": [
+    {
+      "message": "hi",
+      "insights": {
+        "error": "API error: Failed to connect to Ollama. Please check that Ollama is downloaded, running and accessible. https://ollama.com/download"
+      },
+      "timestamp": "2025-06-21T03:45:12.794160"
+    }
+  ]
+}

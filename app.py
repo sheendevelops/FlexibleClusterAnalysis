@@ -7,6 +7,7 @@ from models.master_model import AISapienMaster
 from utils.content_filter import ContentFilter
 from utils.emotion_detector import EmotionDetector
 from utils.web_scraper import get_website_text_content
+from utils.ml_integration import MLIntegration
 from config import get_config_info
 
 # Initialize session state
@@ -134,6 +135,57 @@ def main():
                         st.warning("Currently only text files are supported")
                 except Exception as e:
                     st.error(f"Error learning from file: {str(e)}")
+        
+        st.divider()
+        
+        # ML Analytics Section
+        st.header("🧠 ML Analytics")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("Analyze Patterns", help="Analyze conversation patterns using ML"):
+                with st.spinner("Running pattern analysis..."):
+                    analysis = st.session_state.ml_integration.analyze_conversation_patterns(st.session_state.user_id)
+                    st.session_state.latest_analysis = analysis
+                    if 'error' not in analysis:
+                        st.success("Pattern analysis complete!")
+                        if 'actionable_insights' in analysis:
+                            for insight in analysis['actionable_insights'][:2]:
+                                st.info(insight)
+                    else:
+                        st.error(f"Analysis failed: {analysis['error']}")
+            
+            if st.button("User Segmentation", help="Cluster users by behavior patterns"):
+                with st.spinner("Performing user segmentation..."):
+                    segmentation = st.session_state.ml_integration.analyze_user_segmentation()
+                    st.session_state.latest_segmentation = segmentation
+                    if 'error' not in segmentation:
+                        st.success("User segmentation complete!")
+                    else:
+                        st.error(f"Segmentation failed: {segmentation['error']}")
+        
+        with col2:
+            if st.button("Predict Needs", help="Predict user needs using ML"):
+                with st.spinner("Predicting user needs..."):
+                    predictions = st.session_state.ml_integration.predict_user_needs(st.session_state.user_id)
+                    st.session_state.latest_predictions = predictions
+                    if 'error' not in predictions:
+                        st.success("Predictions ready!")
+                        if 'recommendations' in predictions:
+                            for rec in predictions['recommendations'][:2]:
+                                st.success(rec)
+                    else:
+                        st.error(f"Prediction failed: {predictions['error']}")
+            
+            if st.button("Optimize Models", help="Optimize AI model performance"):
+                with st.spinner("Optimizing models..."):
+                    optimization = st.session_state.ml_integration.optimize_model_performance()
+                    st.session_state.latest_optimization = optimization
+                    if 'error' not in optimization:
+                        st.success("Model optimization complete!")
+                    else:
+                        st.error(f"Optimization failed: {optimization['error']}")
     
     # Main chat interface
     st.header("💬 Chat with AISapien")
@@ -213,7 +265,7 @@ def main():
                 st.error(f"Error processing message: {str(e)}")
     
     # Additional features tabs
-    tab1, tab2, tab3 = st.tabs(["🧠 Knowledge Base", "📈 Analytics", "⚙️ Settings"])
+    tab1, tab2, tab3, tab4 = st.tabs(["🧠 Knowledge Base", "📊 ML Analytics", "📈 Advanced Tools", "⚙️ Settings"])
     
     with tab1:
         st.subheader("Knowledge Base Overview")

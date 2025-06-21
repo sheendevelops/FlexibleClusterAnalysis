@@ -1,1 +1,12 @@
-{}
+{
+  "default_user": {
+    "preferences": {},
+    "communication_style": {},
+    "interests": [],
+    "needs": [],
+    "personality_traits": {},
+    "interaction_history": [],
+    "last_updated": "2025-06-21T03:45:12.791781",
+    "last_emotional_tone": "neutral"
+  }
+}

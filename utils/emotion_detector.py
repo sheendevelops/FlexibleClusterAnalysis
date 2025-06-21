@@ -1,199 +1,207 @@
 import re
+from typing import Dict, Any
 
 class EmotionDetector:
     """
-    Simple emotion detection based on text analysis
+    Simple emotion detection system for user messages
     """
     
-    # Emotion keyword mappings
-    EMOTION_KEYWORDS = {
-        "joy": [
-            "happy", "joy", "joyful", "excited", "thrilled", "delighted", "pleased",
-            "cheerful", "glad", "elated", "euphoric", "blissful", "content", "satisfied",
-            "amazing", "wonderful", "fantastic", "great", "excellent", "awesome"
-        ],
-        "sadness": [
-            "sad", "unhappy", "depressed", "miserable", "sorrowful", "melancholy",
-            "down", "blue", "gloomy", "dejected", "despair", "grief", "heartbroken",
-            "disappointed", "discouraged", "hopeless", "lonely", "terrible", "awful"
-        ],
-        "anger": [
-            "angry", "mad", "furious", "rage", "irritated", "annoyed", "frustrated",
-            "outraged", "livid", "hostile", "resentful", "bitter", "indignant",
-            "aggravated", "infuriated", "hate", "disgusted", "stupid", "ridiculous"
-        ],
-        "fear": [
-            "afraid", "scared", "fearful", "terrified", "anxious", "worried", "nervous",
-            "panic", "frightened", "alarmed", "concerned", "apprehensive", "uneasy",
-            "stressed", "tense", "overwhelmed", "paranoid", "phobic"
-        ],
-        "surprise": [
-            "surprised", "shocked", "amazed", "astonished", "stunned", "bewildered",
-            "confused", "perplexed", "puzzled", "baffled", "unexpected", "sudden",
-            "wow", "oh", "really", "incredible", "unbelievable"
-        ],
-        "disgust": [
-            "disgusted", "revolted", "repulsed", "sick", "nauseous", "gross",
-            "awful", "terrible", "horrible", "nasty", "vile", "repugnant"
-        ],
-        "love": [
-            "love", "adore", "cherish", "treasure", "devoted", "affectionate",
-            "caring", "tender", "passionate", "romantic", "fond", "attached"
-        ],
-        "trust": [
-            "trust", "confident", "sure", "certain", "believe", "faith", "reliable",
-            "dependable", "secure", "comfortable", "safe"
-        ],
-        "anticipation": [
-            "excited", "eager", "looking forward", "anticipating", "expecting",
-            "hopeful", "optimistic", "enthusiastic", "impatient", "can't wait"
-        ]
-    }
-    
-    # Emotion intensifiers
-    INTENSIFIERS = [
-        "very", "extremely", "incredibly", "absolutely", "totally", "completely",
-        "really", "quite", "rather", "pretty", "so", "too", "highly", "deeply"
-    ]
-    
-    # Emotion diminishers
-    DIMINISHERS = [
-        "slightly", "somewhat", "a bit", "a little", "kind of", "sort of",
-        "barely", "hardly", "scarcely", "not very", "not really"
-    ]
-    
-    @classmethod
-    def detect_emotion(cls, text: str) -> str:
-        """
-        Detect the primary emotion in text
-        """
-        if not text:
-            return "neutral"
-        
-        text_lower = text.lower()
-        
-        # Count emotion matches
-        emotion_scores = {}
-        
-        for emotion, keywords in cls.EMOTION_KEYWORDS.items():
-            score = 0
-            for keyword in keywords:
-                # Count occurrences of each keyword
-                count = len(re.findall(r'\b' + re.escape(keyword) + r'\b', text_lower))
-                if count > 0:
-                    # Check for intensifiers/diminishers near the keyword
-                    intensity_modifier = cls._get_intensity_modifier(text_lower, keyword)
-                    score += count * intensity_modifier
-            
-            if score > 0:
-                emotion_scores[emotion] = score
-        
-        # Return the emotion with the highest score
-        if emotion_scores:
-            primary_emotion = max(emotion_scores, key=emotion_scores.get)
-            return primary_emotion
-        
-        return "neutral"
-    
-    @classmethod
-    def detect_emotions_with_confidence(cls, text: str) -> dict:
-        """
-        Detect emotions with confidence scores
-        """
-        if not text:
-            return {"neutral": 1.0}
-        
-        text_lower = text.lower()
-        emotion_scores = {}
-        total_score = 0
-        
-        for emotion, keywords in cls.EMOTION_KEYWORDS.items():
-            score = 0
-            for keyword in keywords:
-                count = len(re.findall(r'\b' + re.escape(keyword) + r'\b', text_lower))
-                if count > 0:
-                    intensity_modifier = cls._get_intensity_modifier(text_lower, keyword)
-                    score += count * intensity_modifier
-            
-            if score > 0:
-                emotion_scores[emotion] = score
-                total_score += score
-        
-        # Convert to confidence scores (percentages)
-        if total_score > 0:
-            confidence_scores = {}
-            for emotion, score in emotion_scores.items():
-                confidence_scores[emotion] = round(score / total_score, 3)
-            return confidence_scores
-        
-        return {"neutral": 1.0}
-    
-    @classmethod
-    def _get_intensity_modifier(cls, text: str, keyword: str) -> float:
-        """
-        Get intensity modifier based on nearby intensifiers/diminishers
-        """
-        # Find the position of the keyword
-        keyword_pos = text.find(keyword)
-        if keyword_pos == -1:
-            return 1.0
-        
-        # Look for intensifiers/diminishers in a window around the keyword
-        window_size = 20  # characters before and after
-        start_pos = max(0, keyword_pos - window_size)
-        end_pos = min(len(text), keyword_pos + len(keyword) + window_size)
-        context = text[start_pos:end_pos]
-        
-        # Check for intensifiers
-        for intensifier in cls.INTENSIFIERS:
-            if intensifier in context:
-                return 1.5  # Boost the score
-        
-        # Check for diminishers
-        for diminisher in cls.DIMINISHERS:
-            if diminisher in context:
-                return 0.5  # Reduce the score
-        
-        return 1.0  # No modification
-    
-    @classmethod
-    def get_emotional_tone(cls, text: str) -> str:
-        """
-        Get overall emotional tone (positive, negative, neutral)
-        """
-        emotions = cls.detect_emotions_with_confidence(text)
-        
-        positive_emotions = ["joy", "love", "trust", "anticipation"]
-        negative_emotions = ["sadness", "anger", "fear", "disgust"]
-        
-        positive_score = sum(emotions.get(emotion, 0) for emotion in positive_emotions)
-        negative_score = sum(emotions.get(emotion, 0) for emotion in negative_emotions)
-        
-        if positive_score > negative_score and positive_score > 0.3:
-            return "positive"
-        elif negative_score > positive_score and negative_score > 0.3:
-            return "negative"
-        else:
-            return "neutral"
-    
-    @classmethod
-    def analyze_emotional_complexity(cls, text: str) -> dict:
-        """
-        Analyze the emotional complexity of text
-        """
-        emotions = cls.detect_emotions_with_confidence(text)
-        
-        # Remove neutral if other emotions are present
-        if len(emotions) > 1 and "neutral" in emotions:
-            del emotions["neutral"]
-        
-        emotional_complexity = {
-            "primary_emotion": max(emotions, key=emotions.get) if emotions else "neutral",
-            "emotion_count": len(emotions),
-            "emotional_intensity": max(emotions.values()) if emotions else 0,
-            "emotional_diversity": len(emotions) / len(cls.EMOTION_KEYWORDS),
-            "emotions_detected": emotions,
-            "overall_tone": cls.get_emotional_tone(text)
+    def __init__(self):
+        # Emotion keywords and patterns
+        self.emotion_patterns = {
+            'happy': ['happy', 'joy', 'excited', 'great', 'awesome', 'wonderful', 'love', 'amazing', 'fantastic', 'excellent'],
+            'sad': ['sad', 'depressed', 'down', 'upset', 'crying', 'miserable', 'heartbroken', 'disappointed'],
+            'angry': ['angry', 'mad', 'furious', 'annoyed', 'frustrated', 'irritated', 'rage', 'hate'],
+            'anxious': ['anxious', 'worried', 'nervous', 'scared', 'afraid', 'panic', 'stress', 'overwhelmed'],
+            'confused': ['confused', 'lost', 'unclear', 'puzzled', 'bewildered', 'perplexed'],
+            'surprised': ['surprised', 'shocked', 'amazed', 'astonished', 'wow', 'incredible'],
+            'neutral': ['okay', 'fine', 'normal', 'usual', 'regular']
         }
         
-        return emotional_complexity
+        # Intensity modifiers
+        self.intensity_modifiers = {
+            'very': 1.5,
+            'extremely': 2.0,
+            'really': 1.3,
+            'quite': 1.2,
+            'somewhat': 0.8,
+            'slightly': 0.6,
+            'a bit': 0.7
+        }
+    
+    def detect_emotion(self, text: str) -> Dict[str, Any]:
+        """
+        Detect emotion in text with confidence score
+        """
+        if not text:
+            return {'emotion': 'neutral', 'confidence': 0.0, 'details': {}}
+        
+        text_lower = text.lower()
+        emotion_scores = {}
+        
+        # Check for emotion keywords
+        for emotion, keywords in self.emotion_patterns.items():
+            score = 0
+            matched_words = []
+            
+            for keyword in keywords:
+                if keyword in text_lower:
+                    base_score = 1.0
+                    
+                    # Check for intensity modifiers
+                    for modifier, multiplier in self.intensity_modifiers.items():
+                        if modifier in text_lower and keyword in text_lower:
+                            # Check if modifier appears near the keyword
+                            if self._words_are_close(text_lower, modifier, keyword):
+                                base_score *= multiplier
+                    
+                    score += base_score
+                    matched_words.append(keyword)
+            
+            if score > 0:
+                emotion_scores[emotion] = {
+                    'score': score,
+                    'matched_words': matched_words
+                }
+        
+        # Determine primary emotion
+        if emotion_scores:
+            primary_emotion = max(emotion_scores.keys(), key=lambda x: emotion_scores[x]['score'])
+            max_score = emotion_scores[primary_emotion]['score']
+            
+            # Calculate confidence based on score and word count
+            word_count = len(text.split())
+            confidence = min(1.0, max_score / max(1, word_count * 0.1))
+            
+            return {
+                'emotion': primary_emotion,
+                'confidence': confidence,
+                'details': emotion_scores
+            }
+        
+        # Check for punctuation-based emotion indicators
+        if '!' in text:
+            if any(word in text_lower for word in ['great', 'awesome', 'amazing', 'yes']):
+                return {'emotion': 'happy', 'confidence': 0.6, 'details': {'punctuation': 'exclamation'}}
+            else:
+                return {'emotion': 'surprised', 'confidence': 0.5, 'details': {'punctuation': 'exclamation'}}
+        
+        if '?' in text:
+            return {'emotion': 'confused', 'confidence': 0.4, 'details': {'punctuation': 'question'}}
+        
+        # Default to neutral
+        return {'emotion': 'neutral', 'confidence': 0.3, 'details': {}}
+    
+    def _words_are_close(self, text: str, word1: str, word2: str, max_distance: int = 3) -> bool:
+        """
+        Check if two words appear close to each other in text
+        """
+        words = text.split()
+        
+        try:
+            pos1 = next(i for i, word in enumerate(words) if word1 in word)
+            pos2 = next(i for i, word in enumerate(words) if word2 in word)
+            return abs(pos1 - pos2) <= max_distance
+        except StopIteration:
+            return False
+    
+    def get_emotion_insights(self, text: str) -> Dict[str, Any]:
+        """
+        Get detailed emotion analysis with insights
+        """
+        emotion_result = self.detect_emotion(text)
+        
+        insights = {
+            'primary_emotion': emotion_result['emotion'],
+            'confidence': emotion_result['confidence'],
+            'emotional_intensity': self._calculate_intensity(text),
+            'emotional_stability': self._assess_stability(text),
+            'recommendations': self._get_response_recommendations(emotion_result['emotion'])
+        }
+        
+        return insights
+    
+    def _calculate_intensity(self, text: str) -> str:
+        """
+        Calculate emotional intensity based on text features
+        """
+        text_lower = text.lower()
+        
+        # Count intensity indicators
+        intensity_score = 0
+        
+        # Caps lock
+        if any(c.isupper() for c in text):
+            intensity_score += 1
+        
+        # Multiple exclamation marks
+        if '!!' in text:
+            intensity_score += 2
+        elif '!' in text:
+            intensity_score += 1
+        
+        # Strong words
+        strong_words = ['very', 'extremely', 'really', 'absolutely', 'completely', 'totally']
+        for word in strong_words:
+            if word in text_lower:
+                intensity_score += 1
+        
+        # Determine intensity level
+        if intensity_score >= 3:
+            return 'high'
+        elif intensity_score >= 1:
+            return 'medium'
+        else:
+            return 'low'
+    
+    def _assess_stability(self, text: str) -> str:
+        """
+        Assess emotional stability based on text patterns
+        """
+        emotion_result = self.detect_emotion(text)
+        details = emotion_result.get('details', {})
+        
+        # Check for mixed emotions
+        if len(details) > 2:
+            return 'unstable'
+        elif len(details) == 2:
+            return 'mixed'
+        else:
+            return 'stable'
+    
+    def _get_response_recommendations(self, emotion: str) -> Dict[str, str]:
+        """
+        Get recommendations for responding to specific emotions
+        """
+        recommendations = {
+            'happy': {
+                'tone': 'enthusiastic and supportive',
+                'approach': 'Share in their positivity and build on their good mood'
+            },
+            'sad': {
+                'tone': 'empathetic and gentle',
+                'approach': 'Offer comfort and understanding, avoid being overly cheerful'
+            },
+            'angry': {
+                'tone': 'calm and understanding',
+                'approach': 'Acknowledge their frustration and help find solutions'
+            },
+            'anxious': {
+                'tone': 'reassuring and patient',
+                'approach': 'Provide calm guidance and break down complex issues'
+            },
+            'confused': {
+                'tone': 'clear and helpful',
+                'approach': 'Provide step-by-step explanations and clarifications'
+            },
+            'surprised': {
+                'tone': 'informative and engaging',
+                'approach': 'Build on their curiosity and provide interesting details'
+            },
+            'neutral': {
+                'tone': 'friendly and professional',
+                'approach': 'Maintain balanced, helpful communication'
+            }
+        }
+        
+        return recommendations.get(emotion, recommendations['neutral'])
