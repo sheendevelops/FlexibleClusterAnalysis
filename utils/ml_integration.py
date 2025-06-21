@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from typing import Dict, List, Any, Optional
 from utils.ml_analytics import MLAnalytics
+from utils.advanced_ml_models import AssociationRuleMining, ProbabilisticModels
 from utils.database_helper import db
 import json
 from datetime import datetime, timedelta
@@ -14,6 +15,8 @@ class MLIntegration:
     
     def __init__(self):
         self.ml_analytics = MLAnalytics()
+        self.association_mining = AssociationRuleMining()
+        self.probabilistic_models = ProbabilisticModels()
         
     def analyze_conversation_patterns(self, user_id: str = None, days: int = 30) -> Dict[str, Any]:
         """
@@ -184,6 +187,117 @@ class MLIntegration:
             
         except Exception as e:
             return {"error": f"Learning effectiveness analysis failed: {str(e)}"}
+    
+    def analyze_association_rules(self, user_id: str = None, min_support: float = 0.1, min_confidence: float = 0.6) -> Dict[str, Any]:
+        """
+        Perform Association Rule Mining on conversation patterns
+        """
+        try:
+            # Fetch conversation data
+            if user_id:
+                conversations = db.find_many(
+                    'conversations', 
+                    {'user_id': user_id},
+                    limit=1000
+                )
+            else:
+                conversations = db.get_recent_records('conversations', limit=1000)
+            
+            if not conversations:
+                return {"error": "No conversation data available for association rule mining"}
+            
+            # Perform association rule mining
+            association_results = self.association_mining.mine_association_rules(
+                conversations, min_support, min_confidence
+            )
+            
+            # Store results
+            self._store_analysis_results("association_rules", association_results, user_id)
+            
+            return association_results
+            
+        except Exception as e:
+            return {"error": f"Association rule mining failed: {str(e)}"}
+    
+    def analyze_probabilistic_relationships(self, user_id: str = None, n_components: int = 3) -> Dict[str, Any]:
+        """
+        Analyze probabilistic relationships using Gaussian Mixture Models
+        """
+        try:
+            # Fetch conversation data
+            if user_id:
+                conversations = db.find_many(
+                    'conversations', 
+                    {'user_id': user_id},
+                    limit=1000
+                )
+            else:
+                conversations = db.get_recent_records('conversations', limit=1000)
+            
+            if not conversations:
+                return {"error": "No conversation data available for probabilistic modeling"}
+            
+            # Perform probabilistic modeling
+            probabilistic_results = self.probabilistic_models.fit_gaussian_mixture_models(
+                conversations, n_components
+            )
+            
+            # Store results
+            self._store_analysis_results("probabilistic_models", probabilistic_results, user_id)
+            
+            return probabilistic_results
+            
+        except Exception as e:
+            return {"error": f"Probabilistic modeling failed: {str(e)}"}
+    
+    def predict_conversation_outcome(self, conversation_features: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Predict conversation outcomes using trained probabilistic models
+        """
+        try:
+            # Make predictions using probabilistic models
+            predictions = self.probabilistic_models.predict_probabilities(conversation_features)
+            
+            if 'error' in predictions:
+                return predictions
+            
+            # Enhance predictions with association rules
+            enhanced_predictions = self._enhance_with_association_rules(predictions, conversation_features)
+            
+            return enhanced_predictions
+            
+        except Exception as e:
+            return {"error": f"Prediction failed: {str(e)}"}
+    
+    def _enhance_with_association_rules(self, predictions: Dict[str, Any], features: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Enhance probabilistic predictions with association rule insights
+        """
+        enhanced = predictions.copy()
+        
+        # Add rule-based recommendations
+        if self.association_mining.association_rules_df is not None:
+            rules_df = self.association_mining.association_rules_df
+            
+            # Find applicable rules based on current features
+            applicable_rules = []
+            
+            # Simple rule matching (can be made more sophisticated)
+            emotion = features.get('emotion', 'neutral')
+            time_period = features.get('time_period', 'unknown')
+            
+            for _, rule in rules_df.iterrows():
+                antecedents = list(rule['antecedents'])
+                if f'emotion_{emotion}' in antecedents or f'time_{time_period}' in antecedents:
+                    applicable_rules.append({
+                        'consequents': list(rule['consequents']),
+                        'confidence': float(rule['confidence']),
+                        'lift': float(rule['lift'])
+                    })
+            
+            enhanced['applicable_rules'] = applicable_rules[:5]  # Top 5 applicable rules
+        
+        return enhanced
     
     def _analyze_conversation_themes(self, df: pd.DataFrame) -> Dict[str, Any]:
         """Analyze themes and topics in conversations using clustering"""
@@ -499,7 +613,9 @@ class MLIntegration:
                     "clustering": "User segmentation and pattern recognition",
                     "eda": "Exploratory Data Analysis for insights",
                     "optimization": "Grid search and hyperparameter tuning",
-                    "prediction": "User behavior and need prediction"
+                    "prediction": "User behavior and need prediction",
+                    "association_rules": "Association Rule Mining for pattern discovery",
+                    "probabilistic_models": "Gaussian Mixture Models for relationship modeling"
                 }
             }
             

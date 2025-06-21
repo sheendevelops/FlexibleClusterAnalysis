@@ -8,6 +8,7 @@ from models.personality_model import PersonalityModel
 from utils.ollama_helper import OllamaHelper
 from utils.content_filter import ContentFilter
 from utils.emotion_detector import EmotionDetector
+from utils.chatgpt_optimization import ChatGPTOptimizer
 
 class AISapienMaster:
     """
@@ -21,6 +22,7 @@ class AISapienMaster:
         self.personality_model = PersonalityModel()
         self.llm_helper = OllamaHelper()
         self.content_filter = ContentFilter()
+        self.chatgpt_optimizer = ChatGPTOptimizer()
         
         self.decisions_file = "data/master_decisions.json"
         self.skills_file = "data/skills_acquired.json"
@@ -203,7 +205,30 @@ class AISapienMaster:
             """
             
             response = self.llm_helper.get_text_response(prompt)
-            return response
+            
+            # Apply ChatGPT-style optimizations
+            optimized_response = self.chatgpt_optimizer.optimize_response_structure(
+                response, {
+                    'emotion': emotion,
+                    'user_message': message,
+                    'conversation_history': []
+                }
+            )
+            
+            # Apply contextual memory enhancement
+            enhanced_response = self.chatgpt_optimizer.enhance_with_contextual_memory(
+                optimized_response, user_id, {
+                    'user_message': message,
+                    'emotion': emotion
+                }
+            )
+            
+            # Apply advanced reasoning synthesis
+            final_response = self.chatgpt_optimizer.apply_advanced_reasoning(
+                enhanced_response, model_insights
+            )
+            
+            return final_response
             
         except Exception as e:
             # Fallback response

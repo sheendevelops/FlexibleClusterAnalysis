@@ -111,6 +111,8 @@ JSON-based knowledge storage for:
 - June 21, 2025: Added PostgreSQL database support 
 - June 21, 2025: Integrated Ollama for offline AI operation
 - June 21, 2025: Added advanced ML features: PCA, EDA, clustering, dimensionality reduction, grid search, elbow method, silhouette score, gap statistic
+- June 21, 2025: Integrated Association Rule Mining (Apriori) and Probabilistic Models (GMMs) for relationship modeling
+- June 21, 2025: Added ChatGPT-style optimizations for response quality and engagement
 
 ## User Preferences
 

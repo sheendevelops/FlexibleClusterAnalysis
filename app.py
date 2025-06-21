@@ -186,6 +186,39 @@ def main():
                         st.success("Model optimization complete!")
                     else:
                         st.error(f"Optimization failed: {optimization['error']}")
+        
+        st.divider()
+        
+        # Advanced ML Features
+        st.header("🔬 Advanced ML Features")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("Association Rules", help="Discover patterns using Apriori algorithm"):
+                with st.spinner("Mining association rules..."):
+                    association_results = st.session_state.ml_integration.analyze_association_rules(st.session_state.user_id)
+                    st.session_state.latest_association = association_results
+                    if 'error' not in association_results:
+                        st.success("Association rule mining complete!")
+                        if 'insights' in association_results:
+                            for insight in association_results['insights'][:2]:
+                                st.info(insight)
+                    else:
+                        st.error(f"Association mining failed: {association_results['error']}")
+        
+        with col2:
+            if st.button("Probabilistic Models", help="Analyze relationships using Gaussian Mixture Models"):
+                with st.spinner("Training probabilistic models..."):
+                    probabilistic_results = st.session_state.ml_integration.analyze_probabilistic_relationships(st.session_state.user_id)
+                    st.session_state.latest_probabilistic = probabilistic_results
+                    if 'error' not in probabilistic_results:
+                        st.success("Probabilistic modeling complete!")
+                        if 'probabilistic_insights' in probabilistic_results:
+                            for insight in probabilistic_results['probabilistic_insights'][:2]:
+                                st.info(insight)
+                    else:
+                        st.error(f"Probabilistic modeling failed: {probabilistic_results['error']}")
     
     # Main chat interface
     st.header("💬 Chat with AISapien")
