@@ -13,6 +13,10 @@ from config import get_config_info
 # Initialize session state
 if 'aisapien' not in st.session_state:
     st.session_state.aisapien = AISapienMaster()
+if 'ml_integration' not in st.session_state:
+    st.session_state.ml_integration = MLIntegration()
+if 'emotion_detector' not in st.session_state:
+    st.session_state.emotion_detector = EmotionDetector()
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
 if 'user_id' not in st.session_state:
@@ -321,7 +325,8 @@ def main():
             emotions = []
             for message in st.session_state.chat_history:
                 if message['role'] == 'user':
-                    emotion = EmotionDetector.detect_emotion(message['content'])
+                    emotion_result = st.session_state.emotion_detector.detect_emotion(message['content'])
+                    emotion = emotion_result['emotion']
                     emotions.append(emotion)
             
             if emotions:
