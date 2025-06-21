@@ -22,6 +22,7 @@ class AISapienMaster:
         self.personality_model = PersonalityModel()
         self.llm_helper = OllamaHelper()
         self.content_filter = ContentFilter()
+        self.emotion_detector = EmotionDetector()
         self.chatgpt_optimizer = ChatGPTOptimizer()
         
         self.decisions_file = "data/master_decisions.json"
@@ -102,7 +103,8 @@ class AISapienMaster:
                 }
             
             # Detect emotion
-            emotion = EmotionDetector.detect_emotion(message)
+            emotion_result = self.emotion_detector.detect_emotion(message)
+            emotion = emotion_result['emotion']
             
             # Update user personality profile
             self.personality_model.create_or_update_user_profile(user_id, message)
