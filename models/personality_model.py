@@ -1,7 +1,7 @@
 import json
 import os
 from typing import Dict, List, Any
-from utils.openai_helper import OpenAIHelper
+from utils.ollama_helper import OllamaHelper
 from utils.database_helper import db
 
 class PersonalityModel:
@@ -11,7 +11,7 @@ class PersonalityModel:
     """
     
     def __init__(self):
-        self.openai_helper = OpenAIHelper()
+        self.llm_helper = OllamaHelper()
         self.users_file = "data/user_profiles.json"
         self.interactions_file = "data/user_interactions.json"
         self.load_user_data()
@@ -78,7 +78,7 @@ class PersonalityModel:
             - emotional_tone: string describing the user's emotional state
             """
             
-            insights = self.openai_helper.get_structured_response(prompt)
+            insights = self.llm_helper.get_structured_response(prompt)
             
             # Update profile with new insights
             self.merge_profile_insights(user_id, insights, existing_profile)
@@ -98,7 +98,7 @@ class PersonalityModel:
                     "needs": [],
                     "personality_traits": {},
                     "interaction_history": [],
-                    "last_updated": self.openai_helper.get_current_timestamp(),
+                    "last_updated": self.llm_helper.get_current_timestamp(),
                     "error": str(e)
                 }
                 self.save_user_profiles()
@@ -143,7 +143,7 @@ class PersonalityModel:
                 "needs": combined_needs,
                 "personality_traits": existing_traits,
                 "interaction_history": existing_profile.get("interaction_history", []),
-                "last_updated": self.openai_helper.get_current_timestamp(),
+                "last_updated": self.llm_helper.get_current_timestamp(),
                 "last_emotional_tone": insights.get("emotional_tone", "neutral")
             }
             
@@ -163,7 +163,7 @@ class PersonalityModel:
             interaction = {
                 "message": message,
                 "insights": insights,
-                "timestamp": self.openai_helper.get_current_timestamp()
+                "timestamp": self.llm_helper.get_current_timestamp()
             }
             
             self.interactions[user_id].append(interaction)
@@ -242,7 +242,7 @@ class PersonalityModel:
             Provide a response that feels tailored specifically to this individual.
             """
             
-            response = self.openai_helper.get_text_response(prompt)
+            response = self.llm_helper.get_text_response(prompt)
             return response
             
         except Exception as e:

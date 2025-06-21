@@ -1,7 +1,7 @@
 import json
 import os
 from typing import Dict, List, Any
-from utils.openai_helper import OpenAIHelper
+from utils.ollama_helper import OllamaHelper
 from utils.database_helper import db
 
 class ConscienceModel:
@@ -11,7 +11,7 @@ class ConscienceModel:
     """
     
     def __init__(self):
-        self.openai_helper = OpenAIHelper()
+        self.llm_helper = OllamaHelper()
         self.load_ethical_principles()
     
     def load_ethical_principles(self):
@@ -55,7 +55,7 @@ class ConscienceModel:
             - affected_groups: list of groups that might be affected
             """
             
-            response = self.openai_helper.get_structured_response(prompt)
+            response = self.llm_helper.get_structured_response(prompt)
             
             # Store this analysis in database
             try:
@@ -114,7 +114,7 @@ class ConscienceModel:
             Focus on empathy, care, and the betterment of humanity.
             """
             
-            response = self.openai_helper.get_text_response(prompt)
+            response = self.llm_helper.get_text_response(prompt)
             return response
             
         except Exception as e:
@@ -157,7 +157,7 @@ class ConscienceModel:
             - mitigation_strategies: list of ways to reduce negative impacts
             """
             
-            response = self.openai_helper.get_structured_response(prompt)
+            response = self.llm_helper.get_structured_response(prompt)
             
             # Store assessment in database
             try:

@@ -7,6 +7,7 @@ from models.master_model import AISapienMaster
 from utils.content_filter import ContentFilter
 from utils.emotion_detector import EmotionDetector
 from utils.web_scraper import get_website_text_content
+from config import get_config_info
 
 # Initialize session state
 if 'aisapien' not in st.session_state:
@@ -69,6 +70,13 @@ def main():
         
         # Status display
         st.header("📊 System Status")
+        
+        # Show LLM backend info
+        config_info = get_config_info()
+        if config_info['llm_backend'] == 'ollama':
+            st.info(f"🤖 Local AI: {config_info['ollama_model']}")
+        else:
+            st.info(f"☁️ OpenAI: {config_info['openai_model']}")
         
         # Get system status
         status = st.session_state.aisapien.get_system_status()

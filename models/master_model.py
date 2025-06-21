@@ -5,7 +5,7 @@ from typing import Dict, List, Any
 from models.conscience_model import ConscienceModel
 from models.logic_model import LogicModel
 from models.personality_model import PersonalityModel
-from utils.openai_helper import OpenAIHelper
+from utils.ollama_helper import OllamaHelper
 from utils.content_filter import ContentFilter
 from utils.emotion_detector import EmotionDetector
 
@@ -19,7 +19,7 @@ class AISapienMaster:
         self.conscience_model = ConscienceModel()
         self.logic_model = LogicModel()
         self.personality_model = PersonalityModel()
-        self.openai_helper = OpenAIHelper()
+        self.llm_helper = OllamaHelper()
         self.content_filter = ContentFilter()
         
         self.decisions_file = "data/master_decisions.json"
@@ -202,7 +202,7 @@ class AISapienMaster:
             Provide a response that represents the best synthesis of all models while prioritizing humanity's betterment.
             """
             
-            response = self.openai_helper.get_text_response(prompt)
+            response = self.llm_helper.get_text_response(prompt)
             return response
             
         except Exception as e:
@@ -215,7 +215,7 @@ class AISapienMaster:
         """
         try:
             decision = {
-                "timestamp": self.openai_helper.get_current_timestamp(),
+                "timestamp": self.llm_helper.get_current_timestamp(),
                 "user_id": user_id,
                 "input_message": input_message,
                 "model_insights": model_insights,
@@ -261,7 +261,7 @@ class AISapienMaster:
             - creative_skills: list of creative approaches
             """
             
-            new_skills = self.openai_helper.get_structured_response(prompt)
+            new_skills = self.llm_helper.get_structured_response(prompt)
             
             # Add new skills to our collection
             for category, skills in new_skills.items():
@@ -304,7 +304,7 @@ class AISapienMaster:
             - potential_skills: skills that could be developed from this knowledge
             """
             
-            insights = self.openai_helper.get_structured_response(prompt)
+            insights = self.llm_helper.get_structured_response(prompt)
             
             # Store knowledge in appropriate models
             if insights.get('ethical_insights'):
@@ -312,7 +312,7 @@ class AISapienMaster:
                 self.conscience_model.knowledge['ethical_cases'].append({
                     "source": source,
                     "insights": insights['ethical_insights'],
-                    "timestamp": self.openai_helper.get_current_timestamp()
+                    "timestamp": self.llm_helper.get_current_timestamp()
                 })
                 self.conscience_model.save_knowledge()
             
@@ -321,7 +321,7 @@ class AISapienMaster:
                 self.logic_model.knowledge['analysis_cases'].append({
                     "source": source,
                     "patterns": insights['logical_patterns'],
-                    "timestamp": self.openai_helper.get_current_timestamp()
+                    "timestamp": self.llm_helper.get_current_timestamp()
                 })
                 self.logic_model.save_knowledge()
             

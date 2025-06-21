@@ -1,7 +1,7 @@
 import json
 import os
 from typing import Dict, List, Any
-from utils.openai_helper import OpenAIHelper
+from utils.ollama_helper import OllamaHelper
 
 class LogicModel:
     """
@@ -10,7 +10,7 @@ class LogicModel:
     """
     
     def __init__(self):
-        self.openai_helper = OpenAIHelper()
+        self.llm_helper = OllamaHelper()
         self.logical_frameworks = [
             "Cost-benefit analysis",
             "Risk assessment",
@@ -69,14 +69,14 @@ class LogicModel:
             - success_probability: number from 0-100 (percentage)
             """
             
-            response = self.openai_helper.get_structured_response(prompt)
+            response = self.llm_helper.get_structured_response(prompt)
             
             # Store analysis for learning
             self.knowledge["analysis_cases"].append({
                 "scenario": scenario,
                 "context": context,
                 "analysis": response,
-                "timestamp": self.openai_helper.get_current_timestamp()
+                "timestamp": self.llm_helper.get_current_timestamp()
             })
             self.save_knowledge()
             
@@ -129,7 +129,7 @@ class LogicModel:
             Focus on practicality, efficiency, and measurable outcomes.
             """
             
-            response = self.openai_helper.get_text_response(prompt)
+            response = self.llm_helper.get_text_response(prompt)
             return response
             
         except Exception as e:
@@ -176,7 +176,7 @@ class LogicModel:
             - success_metrics: list of ways to measure success
             """
             
-            response = self.openai_helper.get_structured_response(prompt)
+            response = self.llm_helper.get_structured_response(prompt)
             
             # Store optimization strategy
             self.knowledge["optimization_strategies"].append({
@@ -184,7 +184,7 @@ class LogicModel:
                 "objectives": objectives,
                 "constraints": constraints,
                 "strategy": response,
-                "timestamp": self.openai_helper.get_current_timestamp()
+                "timestamp": self.llm_helper.get_current_timestamp()
             })
             self.save_knowledge()
             
@@ -221,13 +221,13 @@ class LogicModel:
             - sensitivity_factors: list of factors that could affect ROI
             """
             
-            response = self.openai_helper.get_structured_response(prompt)
+            response = self.llm_helper.get_structured_response(prompt)
             
             # Store ROI analysis
             self.knowledge["performance_metrics"].append({
                 "investment": investment,
                 "analysis": response,
-                "timestamp": self.openai_helper.get_current_timestamp()
+                "timestamp": self.llm_helper.get_current_timestamp()
             })
             self.save_knowledge()
             

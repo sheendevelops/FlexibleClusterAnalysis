@@ -14,8 +14,9 @@ AISapien is an advanced AI assistant built with Streamlit that implements a mult
 
 ### Technology Stack
 - **Frontend**: Streamlit web interface
-- **Backend**: Python 3.11+ with OpenAI GPT-4o integration
+- **Backend**: Python 3.11+ with Ollama (offline) or OpenAI integration
 - **Database**: PostgreSQL for persistent data storage
+- **AI Models**: Supports local Ollama models or OpenAI GPT-4o
 - **Dependencies**: See requirements.txt for full list
 
 ## Installation Instructions
@@ -23,7 +24,8 @@ AISapien is an advanced AI assistant built with Streamlit that implements a mult
 ### Prerequisites
 - Python 3.11 or newer
 - PostgreSQL database (local or remote)
-- OpenAI API key
+- **Option A**: Ollama (for offline operation) - Recommended
+- **Option B**: OpenAI API key (for online operation)
 
 ### Local Setup
 
@@ -43,18 +45,43 @@ AISapien is an advanced AI assistant built with Streamlit that implements a mult
 
 4. **Configure Environment Variables**
    Create a `.env` file in the project root:
+   
+   **For Ollama (Offline - Recommended):**
    ```env
+   LLM_BACKEND=ollama
+   OLLAMA_MODEL=llama3.1
+   DATABASE_URL=postgresql://username:password@localhost:5432/aisapien_db
+   ```
+   
+   **For OpenAI (Online):**
+   ```env
+   LLM_BACKEND=openai
    OPENAI_API_KEY=your_openai_api_key_here
    DATABASE_URL=postgresql://username:password@localhost:5432/aisapien_db
    ```
 
-5. **Initialize the Database**
-   Run the database setup script:
+5. **Setup AI Backend**
+   
+   **For Ollama (Recommended):**
+   ```bash
+   # Install Ollama
+   curl -fsSL https://ollama.com/install.sh | sh
+   
+   # Download a model
+   ollama pull llama3.1
+   
+   # Start Ollama service
+   ollama serve
+   ```
+   
+   **For OpenAI:** Just ensure your API key is set in `.env`
+
+6. **Initialize the Database**
    ```bash
    python setup_database.py
    ```
 
-6. **Start the Application**
+7. **Start the Application**
    ```bash
    streamlit run app.py --server.port 5000
    ```

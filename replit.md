@@ -79,7 +79,9 @@ JSON-based knowledge storage for:
 - **File-based Architecture**: No external database required, all data stored locally
 
 ### AI Services
-- **OpenAI GPT-4o**: Latest model as of May 13, 2024
+- **Ollama Integration**: Local LLM support for offline operation (Primary)
+- **OpenAI GPT-4o**: Cloud-based alternative (Secondary)
+- **Configurable Backend**: Easy switching between local and cloud AI
 - **Custom Prompt Engineering**: Structured prompts for ethical and logical analysis
 - **JSON Response Format**: Structured data exchange with AI models
 
@@ -103,8 +105,9 @@ JSON-based knowledge storage for:
 
 ## Changelog
 
-Changelog:
-- June 18, 2025. Initial setup
+- June 18, 2025: Initial setup with OpenAI integration
+- June 21, 2025: Added PostgreSQL database support 
+- June 21, 2025: Integrated Ollama for offline AI operation
 
 ## User Preferences
 
